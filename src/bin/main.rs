@@ -12,7 +12,7 @@ fn main() {
     let listener = TcpListener::bind("localhost:3000").unwrap();
     let pool = ThreadPool::new(4);
 
-    for stream in listener.incoming() {
+    for stream in listener.incoming().take(2) {
         let stream = stream.unwrap();
         pool.execute(|| {
             handle_connection(stream)
@@ -34,7 +34,7 @@ fn handle_connection (mut stream: TcpStream) {
     let req_line = buf_reader.lines().next().unwrap().unwrap();
 
     if req_line == "GET / HTTP/1.1" {
-        thread::sleep(Duration::from_secs(5));
+        //thread::sleep(Duration::from_secs(5));
         send_page("HTTP/1.1 200 OK", "index.html", stream);
     } else {
         send_page("HTTP/1.1 404 Not Found", "404.html", stream);
